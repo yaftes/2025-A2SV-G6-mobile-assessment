@@ -1,38 +1,34 @@
-import 'dart:convert';
-
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:g6_assessment/core/error/exceptions.dart';
-import 'package:g6_assessment/features/auth/data/models/user_model.dart';
-import 'package:g6_assessment/features/auth/domain/entities/user.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class AuthLocalDataSource {
-  Future<User> getUserInfo(String userInfo);
-
-  Future<void> storeUserInfo();
+  Future<String> getAccessToken(String userInfo);
+  Future<void> storeAccessToken(String key, String accessToken);
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
-  final SharedPreferences prefs;
-  AuthLocalDataSourceImpl({required this.prefs});
+  final FlutterSecureStorage storage;
+  AuthLocalDataSourceImpl({required this.storage});
 
   @override
-  Future<User> getUserInfo(String userInfo) async {
+  Future<String> getAccessToken(String key) async {
     try {
-      final data = prefs.getString(userInfo);
+      final data = await storage.read(key: key);
       if (data == null) {
         throw CacheException();
       }
-      Map<String, dynamic> userData = jsonDecode(data);
-
-      return UserModel.fromJson(userData);
+      return data;
     } catch (e) {
       throw CacheException();
     }
   }
 
   @override
-  Future<void> storeUserInfo() {
-    // TODO: implement storeUserInfo
-    throw UnimplementedError();
+  Future<void> storeAccessToken(String key, String accessToken) async {
+    try {
+      await storage.write(key: key, value: accessToken);
+    } catch (e) {
+      throw CacheException();
+    }
   }
 }
