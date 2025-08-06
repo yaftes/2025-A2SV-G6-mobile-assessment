@@ -1,6 +1,6 @@
 class User {
-  String name;
-  String email;
-  String password;
-  User({required this.name, required this.email, required this.password});
+  String? name;
+  String? email;
+  String? password;
+  User({this.name, this.email, this.password});
 }
