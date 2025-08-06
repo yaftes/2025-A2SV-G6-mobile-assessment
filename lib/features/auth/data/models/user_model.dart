@@ -1,14 +1,23 @@
 import 'package:g6_assessment/features/auth/domain/entities/user.dart';
 
 class UserModel extends User {
-  UserModel(String name, String password)
-    : super(name: name, password: password);
+  UserModel({super.name, super.password, super.id, super.email});
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(json['name'], json['password']);
+    return UserModel(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      password: json['password'] ?? '',
+      email: json['email'] ?? '',
+    );
   }
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'password': password};
+    return {
+      'name': name ?? '',
+      'password': password ?? '',
+      'email': email ?? '',
+      'id': id ?? '',
+    };
   }
 }
