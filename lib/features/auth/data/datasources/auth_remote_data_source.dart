@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:g6_assessment/core/constants/constants.dart';
 import 'package:g6_assessment/core/error/exceptions.dart';
 import 'package:g6_assessment/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:g6_assessment/features/auth/data/models/user_model.dart';
@@ -24,33 +25,42 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<User> login(String email, String password) async {
-    // : send first
-    // : use the access token then make another request
-    // : store the access token
-    // : fetch the data and navigate to home page
-
-    final url = Uri.parse(
-      'https://g5-flutter-learning-path-be.onrender.com/api/v3/auth/login',
-    );
-
     try {
+      String? storedAccessToken = (await localDataSource.getAccessToken(
+        StorageKeys.accessToken,
+      ));
+
+      if (storedAccessToken != null) {
+        final responseFromAccessTokenRequest = await client.get(
+          Uri.parse(AuthApiConstants.userMeUrl),
+          headers: {'Authorization': 'Bearer $storedAccessToken'},
+        );
+
+        if (responseFromAccessTokenRequest.statusCode != 200 &&
+            responseFromAccessTokenRequest.statusCode != 201) {
+          throw ServerException();
+        }
+        final userData =
+            jsonDecode(responseFromAccessTokenRequest.body)['data']
+                as Map<String, dynamic>;
+
+        return UserModel.fromJson(userData);
+      }
+
       final response = await client.post(
-        url,
+        Uri.parse(AuthApiConstants.loginUrl),
         body: {'email': email, 'password': password},
       );
+
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw ServerException();
       }
       final data = jsonDecode(response.body) as Map<String, dynamic>;
-      final accessToken = data['data']['access_token'];
-
-      final urlForAccessToken = Uri.parse(
-        'https://g5-flutter-learning-path-be.onrender.com/api/v3/users/me',
-      );
+      final newAccessToken = data['data']['access_token'];
 
       final responseFromAccessTokenRequest = await client.get(
-        urlForAccessToken,
-        headers: {'Authorization': 'Bearer $accessToken'},
+        Uri.parse(AuthApiConstants.userMeUrl),
+        headers: {'Authorization': 'Bearer $newAccessToken'},
       );
 
       if (responseFromAccessTokenRequest.statusCode != 200 &&
@@ -61,7 +71,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           jsonDecode(responseFromAccessTokenRequest.body)['data']
               as Map<String, dynamic>;
 
-      await localDataSource.storeAccessToken('ACCESS_TOKEN', accessToken);
+      await localDataSource.storeAccessToken(
+        StorageKeys.accessToken,
+        newAccessToken,
+      );
 
       return UserModel.fromJson(userData);
     } catch (e) {
@@ -72,7 +85,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> logout() async {
     try {
-      await localDataSource.storeAccessToken('ACCESS_TOKEN', '');
+      await localDataSource.storeAccessToken(StorageKeys.accessToken, '');
     } catch (e) {
       CacheException();
     }
@@ -80,13 +93,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<User> signUp(String name, String email, String password) async {
-    final url = Uri.parse(
-      'https://g5-flutter-learning-path-be.onrender.com/api/v3/auth/register',
-    );
-
     try {
       final response = await client.post(
-        url,
+        Uri.parse(AuthApiConstants.registerUrl),
         body: {'email': email, 'password': password, 'name': name},
       );
       if (response.statusCode != 200 && response.statusCode != 201) {
