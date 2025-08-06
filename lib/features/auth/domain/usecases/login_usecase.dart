@@ -7,7 +7,7 @@ class LoginUsecase {
   final AuthRepository repository;
   LoginUsecase(this.repository);
 
-  Future<Either<Failure, User>> call() {
-    return repository.login();
+  Future<Either<Failure, User>> call(String email, String password) {
+    return repository.login(email, password);
   }
 }
