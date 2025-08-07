@@ -5,6 +5,7 @@ import 'package:g6_assessment/features/auth/data/datasources/auth_remote_data_so
 import 'package:g6_assessment/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:g6_assessment/features/auth/domain/repositories/auth_repository.dart';
 import 'package:g6_assessment/features/auth/domain/usecases/login_usecase.dart';
+import 'package:g6_assessment/features/auth/domain/usecases/login_with_token_usecase.dart';
 import 'package:g6_assessment/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:g6_assessment/features/auth/domain/usecases/signup_usecase.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_bloc.dart';
@@ -45,6 +46,7 @@ Future<void> init() async {
   getIt.registerLazySingleton(() => LoginUsecase(getIt()));
   getIt.registerLazySingleton(() => LogoutUsecase(getIt()));
   getIt.registerLazySingleton(() => SignUpUsecase(getIt()));
+  getIt.registerLazySingleton(() => LoginWithTokenUsecase(getIt()));
 
   // Bloc
   getIt.registerFactory(
@@ -52,6 +54,7 @@ Future<void> init() async {
       loginUsecase: getIt(),
       logoutUsecase: getIt(),
       signUpUsecase: getIt(),
+      loginWithTokenUsecase: getIt(),
     ),
   );
 }

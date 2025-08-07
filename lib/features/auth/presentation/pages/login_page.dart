@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_bloc.dart';
@@ -20,69 +21,79 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    context.read<AuthBloc>().add(
-      LoginEvent(_emailController.text, _passwordController.text),
-    );
+    context.read<AuthBloc>().add(LoginWithTokenEvent());
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = const Color.fromARGB(255, 93, 78, 252);
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is UserDataFetchedState) {
-            // : TODO navigate to home page using this data
-          }
-        },
-        builder: (context, state) {
-          if (state is LoadingState) {
-            return Center(child: CircularProgressIndicator());
-          } else if (state is ErrorState) {
-            return Center(child: Text(state.message));
-          }
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 70),
+      body: SafeArea(
+        child: BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is UserDataFetchedState) {
+              Navigator.of(context).pushReplacementNamed('/home');
+            } else if (state is ErrorState) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
+            }
+          },
+          builder: (context, state) {
+            final isLoading = state is LoadingState;
 
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Logo / Title
                   Center(
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color.fromARGB(255, 93, 78, 252),
-                        ),
-                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(color: primaryColor),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         'ECOM',
                         style: GoogleFonts.aBeeZee(
-                          color: const Color.fromARGB(255, 93, 78, 252),
-                          fontSize: 35,
+                          fontSize: 40,
+                          fontWeight: FontWeight.w700,
+                          color: primaryColor,
+                          letterSpacing: 1.5,
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(height: 50),
+                  const SizedBox(height: 48),
 
+                  // Heading
                   Center(
                     child: Text(
                       'Sign into your account',
                       style: GoogleFonts.poppins(
-                        fontSize: 24,
+                        fontSize: 26,
                         fontWeight: FontWeight.w600,
+                        color: Colors.black87,
                       ),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 36),
 
+                  // Form
                   Form(
                     key: formkey,
                     child: Column(
@@ -90,116 +101,151 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Text(
                           'Email',
-                          style: GoogleFonts.poppins(color: Colors.grey),
+                          style: GoogleFonts.poppins(
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 8),
                         TextFormField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
                           validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'email is required';
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Email is required';
+                            }
+                            if (!RegExp(
+                              r'^[^@]+@[^@]+\.[^@]+',
+                            ).hasMatch(value)) {
+                              return 'Enter a valid email';
                             }
                             return null;
                           },
-                          style: TextStyle(color: Colors.black),
-                          controller: _emailController,
+                          style: const TextStyle(color: Colors.black87),
                           decoration: InputDecoration(
-                            hintText: 'ex: john@gmail.com',
-                            hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                            fillColor: const Color.fromARGB(255, 241, 239, 239),
+                            hintText: 'example@gmail.com',
+                            hintStyle: GoogleFonts.poppins(
+                              color: Colors.grey[400],
+                            ),
                             filled: true,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 15,
-                              vertical: 10,
+                            fillColor: Colors.grey[100],
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
                             ),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 20),
+
                         Text(
                           'Password',
-
-                          style: GoogleFonts.poppins(color: Colors.grey),
+                          style: GoogleFonts.poppins(
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 8),
                         TextFormField(
+                          controller: _passwordController,
                           obscureText: true,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'password is required';
+                              return 'Password is required';
+                            }
+                            if (value.length < 6) {
+                              return 'Password must be at least 6 characters';
                             }
                             return null;
                           },
-                          style: TextStyle(color: Colors.black),
-                          controller: _passwordController,
+                          style: const TextStyle(color: Colors.black87),
                           decoration: InputDecoration(
-                            hintText: '*********',
-                            hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                            fillColor: const Color.fromARGB(255, 241, 239, 239),
+                            hintText: '********',
+                            hintStyle: GoogleFonts.poppins(
+                              color: Colors.grey[400],
+                            ),
                             filled: true,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 15,
-                              vertical: 10,
+                            fillColor: Colors.grey[100],
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
                             ),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
                           ),
                         ),
-                        SizedBox(height: 40),
+                        const SizedBox(height: 36),
+
+                        // Login Button
                         SizedBox(
-                          width: double.infinity,
+                          height: 50,
                           child: ElevatedButton(
+                            onPressed: isLoading
+                                ? null
+                                : () {
+                                    if (formkey.currentState!.validate()) {
+                                      context.read<AuthBloc>().add(
+                                        LoginEvent(
+                                          _emailController.text.trim(),
+                                          _passwordController.text,
+                                        ),
+                                      );
+                                    }
+                                  },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(
-                                255,
-                                93,
-                                78,
-                                252,
-                              ),
+                              backgroundColor: primaryColor,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadiusGeometry.circular(10),
+                                borderRadius: BorderRadius.circular(12),
                               ),
+                              elevation: 4,
                             ),
-                            onPressed: () {
-                              if (formkey.currentState!.validate()) {
-                                context.read<AuthBloc>().add(
-                                  LoginEvent(
-                                    _emailController.text,
-                                    _passwordController.text,
+                            child: isLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : Text(
+                                    'SIGN IN',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 1.2,
+                                    ),
                                   ),
-                                );
-                              }
-                            },
-                            child: Text(
-                              'SIGN IN',
-                              style: GoogleFonts.poppins(color: Colors.white),
-                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 20),
+
+                  const SizedBox(height: 28),
+
+                  // Sign up text
                   Center(
                     child: Text.rich(
                       TextSpan(
+                        style: GoogleFonts.poppins(fontSize: 14),
                         children: [
                           TextSpan(
-                            text: "Don't have an account ? ",
-                            style: TextStyle(color: Colors.grey),
+                            text: "Don't have an account? ",
+                            style: const TextStyle(color: Colors.grey),
                           ),
                           TextSpan(
-                            onEnter: (event) {
-                              // : TODO add navigate to sign up page
-                            },
                             text: 'SIGN UP',
                             style: TextStyle(
-                              color: const Color.fromARGB(255, 93, 78, 252),
+                              color: primaryColor,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
                             ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                Navigator.of(context).pushNamed('/signup');
+                              },
                           ),
                         ],
                       ),
@@ -207,9 +253,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ],
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

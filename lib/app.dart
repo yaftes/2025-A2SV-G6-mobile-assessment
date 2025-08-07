@@ -14,7 +14,6 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => SignupPage(),
       },
       debugShowCheckedModeBanner: false,
-      home: SignupPage(),
     );
   }
 }

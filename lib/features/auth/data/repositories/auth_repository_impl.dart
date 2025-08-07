@@ -64,4 +64,16 @@ class AuthRepositoryImpl implements AuthRepository {
       ServerFailure(message: 'please check your internet connection'),
     );
   }
+
+  @override
+  Future<Either<Failure, User>> loginWithToken() async {
+    try {
+      User user = await remoteDataSource.loginWithToken();
+      return Right(user);
+    } on ServerException {
+      return Left(ServerFailure(message: ''));
+    } on CacheException {
+      return Left(CacheFailure(message: ''));
+    }
+  }
 }

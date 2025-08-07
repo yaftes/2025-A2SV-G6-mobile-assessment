@@ -8,16 +8,10 @@ import 'package:http/http.dart' as http;
 
 abstract class AuthRemoteDataSource {
   Future<User> signUp(String name, String email, String password);
-
   Future<User> login(String email, String password);
-
   Future<void> logout();
-
-  // login with access token
+  Future<User> loginWithToken();
 }
-
-// if the user have access token send request using that access token
-// if not show login page
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final http.Client client;
@@ -31,28 +25,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<User> login(String email, String password) async {
     try {
-
-      String? storedAccessToken = (await localDataSource.getAccessToken(
-        StorageKeys.accessToken,
-      ));
-
-      if (storedAccessToken != null) {
-        final responseFromAccessTokenRequest = await client.get(
-          Uri.parse(AuthApiConstants.userMeUrl),
-          headers: {'Authorization': 'Bearer $storedAccessToken'},
-        );
-
-        if (responseFromAccessTokenRequest.statusCode != 200 &&
-            responseFromAccessTokenRequest.statusCode != 201) {
-          throw ServerException();
-        }
-        final userData =
-            jsonDecode(responseFromAccessTokenRequest.body)['data']
-                as Map<String, dynamic>;
-
-        return UserModel.fromJson(userData);
-      }
-
       final response = await client.post(
         Uri.parse(AuthApiConstants.loginUrl),
         body: {'email': email, 'password': password},
@@ -61,28 +33,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw ServerException();
       }
+
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       final newAccessToken = data['data']['access_token'];
-
-      final responseFromAccessTokenRequest = await client.get(
-        Uri.parse(AuthApiConstants.userMeUrl),
-        headers: {'Authorization': 'Bearer $newAccessToken'},
-      );
-
-      if (responseFromAccessTokenRequest.statusCode != 200 &&
-          responseFromAccessTokenRequest.statusCode != 201) {
-        throw ServerException();
-      }
-      final userData =
-          jsonDecode(responseFromAccessTokenRequest.body)['data']
-              as Map<String, dynamic>;
 
       await localDataSource.storeAccessToken(
         StorageKeys.accessToken,
         newAccessToken,
       );
 
-      return UserModel.fromJson(userData);
+      return UserModel.fromJson(data['data']);
     } catch (e) {
       throw ServerException();
     }
@@ -93,7 +53,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       await localDataSource.storeAccessToken(StorageKeys.accessToken, '');
     } catch (e) {
-      CacheException();
+      throw CacheException();
     }
   }
 
@@ -112,5 +72,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e) {
       throw ServerException();
     }
+  }
+
+  @override
+  Future<User> loginWithToken() async {
+    final token = await localDataSource.getAccessToken(StorageKeys.accessToken);
+
+    if (token == null || token.isEmpty) {
+      throw ServerException();
+    }
+
+    final response = await client.get(
+      Uri.parse(AuthApiConstants.userMeUrl),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw ServerException();
+    }
+
+    final userData = jsonDecode(response.body)['data'];
+    return UserModel.fromJson(userData);
   }
 }
