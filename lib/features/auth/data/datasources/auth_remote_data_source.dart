@@ -12,7 +12,12 @@ abstract class AuthRemoteDataSource {
   Future<User> login(String email, String password);
 
   Future<void> logout();
+
+  // login with access token
 }
+
+// if the user have access token send request using that access token
+// if not show login page
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final http.Client client;

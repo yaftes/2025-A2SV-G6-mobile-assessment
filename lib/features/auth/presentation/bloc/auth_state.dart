@@ -8,9 +8,10 @@ abstract class AuthState extends Equatable {
 
 class InitialState extends AuthState {}
 
-class UserFetchedState extends AuthState {
+// logged in or singed in
+class UserDataFetchedState extends AuthState {
   final User user;
-  UserFetchedState(this.user);
+  UserDataFetchedState(this.user);
 }
 
 class ErrorState extends AuthState {

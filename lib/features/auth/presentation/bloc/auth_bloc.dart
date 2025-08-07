@@ -6,7 +6,6 @@ import 'package:g6_assessment/features/auth/presentation/bloc/auth_event.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  // let's inject the usecases here
   final LoginUsecase loginUsecase;
   final LogoutUsecase logoutUsecase;
   final SignUpUsecase signUpUsecase;
@@ -16,15 +15,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.logoutUsecase,
     required this.signUpUsecase,
   }) : super(InitialState()) {
+    // login
     on<LoginEvent>((event, emit) async {
       emit(LoadingState());
       final result = await loginUsecase(event.email, event.password);
 
       result.fold(
         (failure) => emit(ErrorState(message: failure.message)),
-        (success) => emit(UserFetchedState(success)),
+        (success) => emit(UserDataFetchedState(success)),
       );
     });
+
+    // logout
     on<LogoutEvent>((event, emit) async {
       emit(LoadingState());
       final result = await logoutUsecase();
@@ -33,6 +35,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         (success) => LoggedOutState(),
       );
     });
+
+    // sign up
     on<SignUpEvent>((event, emit) async {
       emit(LoadingState());
       final result = await signUpUsecase(
@@ -42,7 +46,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       result.fold(
         (failure) => emit(ErrorState(message: failure.message)),
-        (success) => emit(UserFetchedState(success)),
+        (success) => emit(UserDataFetchedState(success)),
       );
     });
   }

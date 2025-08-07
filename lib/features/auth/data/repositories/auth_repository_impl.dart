@@ -2,7 +2,6 @@ import 'package:dartz/dartz.dart';
 import 'package:g6_assessment/core/error/exceptions.dart';
 import 'package:g6_assessment/core/error/failures.dart';
 import 'package:g6_assessment/core/platform/network_info.dart';
-import 'package:g6_assessment/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:g6_assessment/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:g6_assessment/features/auth/domain/entities/user.dart';
 import 'package:g6_assessment/features/auth/domain/repositories/auth_repository.dart';
@@ -10,12 +9,12 @@ import 'package:g6_assessment/features/auth/domain/repositories/auth_repository.
 class AuthRepositoryImpl implements AuthRepository {
   final NetworkInfo networkInfo;
   final AuthRemoteDataSource remoteDataSource;
-  final AuthLocalDataSource localDataSource;
+
   AuthRepositoryImpl({
-    required this.localDataSource,
     required this.networkInfo,
     required this.remoteDataSource,
   });
+
   @override
   Future<Either<Failure, User>> login(String email, String password) async {
     if (await networkInfo.isConnected) {
@@ -27,17 +26,24 @@ class AuthRepositoryImpl implements AuthRepository {
       }
     }
 
-    return Left(ServerFailure(message: 'server failure'));
+    return Left(
+      ServerFailure(message: 'please check your internet connection'),
+    );
   }
 
   @override
   Future<Either<Failure, Unit>> logout() async {
-    try {
-      await remoteDataSource.logout();
-      return Right(unit);
-    } on CacheException {
-      return Left(ServerFailure(message: 'server failure'));
+    if (await networkInfo.isConnected) {
+      try {
+        await remoteDataSource.logout();
+        return Right(unit);
+      } on CacheException {
+        return Left(CacheFailure(message: 'Cache failure'));
+      }
     }
+    return Left(
+      ServerFailure(message: 'please check your internet connection'),
+    );
   }
 
   @override
@@ -54,6 +60,8 @@ class AuthRepositoryImpl implements AuthRepository {
         return Left(ServerFailure(message: 'server failure'));
       }
     }
-    return Left(ServerFailure(message: 'server failure'));
+    return Left(
+      ServerFailure(message: 'please check your internet connection'),
+    );
   }
 }

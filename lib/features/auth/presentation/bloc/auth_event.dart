@@ -1,5 +1,3 @@
-import 'package:g6_assessment/features/auth/domain/entities/user.dart';
-
 abstract class AuthEvent {}
 
 class LoginEvent extends AuthEvent {
