@@ -17,3 +17,7 @@ class ErrorState extends AuthState {
   final String message;
   ErrorState({required this.message});
 }
+
+class LoadingState extends AuthState {}
+
+class LoggedOutState extends AuthState {}

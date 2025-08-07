@@ -1,17 +1,19 @@
-// here are the events performed by the user
-
 import 'package:g6_assessment/features/auth/domain/entities/user.dart';
 
 abstract class AuthEvent {}
 
 class LoginEvent extends AuthEvent {
-  User user;
-  LoginEvent(this.user);
+  String email;
+  String password;
+  LoginEvent(this.email, this.password);
 }
 
 class SignUpEvent extends AuthEvent {
-  User user;
-  SignUpEvent(this.user);
+  String name;
+  String email;
+  String password;
+
+  SignUpEvent(this.name, this.email, this.password);
 }
 
 class LogoutEvent extends AuthEvent {}
