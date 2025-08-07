@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:g6_assessment/features/auth/presentation/pages/login_page.dart';
 import 'package:g6_assessment/features/auth/presentation/pages/signup_page.dart';
+import 'package:g6_assessment/features/chat/presentation/pages/chat_message_page.dart';
 import 'package:g6_assessment/features/chat/presentation/pages/home_page.dart';
 
 class MyApp extends StatelessWidget {
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => HomePage(),
+        '/': (context) => ChatMessagePage(),
         '/signup': (context) => SignupPage(),
       },
       debugShowCheckedModeBanner: false,

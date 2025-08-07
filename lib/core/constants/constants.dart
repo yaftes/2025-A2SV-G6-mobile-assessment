@@ -9,3 +9,9 @@ class AuthApiConstants {
 class StorageKeys {
   static const String accessToken = 'ACCESS_TOKEN';
 }
+
+class ChatApiConstants {
+  static const String baseUrl =
+      'https://g5-flutter-learning-path-be-tvum.onrender.com/api/v3';
+  static const String chatUrl = '$baseUrl/chats';
+}
