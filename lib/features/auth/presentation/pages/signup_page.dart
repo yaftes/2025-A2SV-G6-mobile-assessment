@@ -53,7 +53,7 @@ class _SignupPageState extends State<SignupPage> {
               ),
               child: Text(
                 'ECOM',
-                style: GoogleFonts.aBeeZee(
+                style: GoogleFonts.caladea(
                   color: const Color.fromARGB(255, 93, 78, 252),
                   fontSize: 20,
                 ),
@@ -170,6 +170,7 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         SizedBox(height: 10),
                         TextFormField(
+                          obscureText: true,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'password is required';
@@ -201,6 +202,7 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         SizedBox(height: 10),
                         TextFormField(
+                          obscureText: true,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'email is required';
@@ -289,6 +291,7 @@ class _SignupPageState extends State<SignupPage> {
                   ),
 
                   SizedBox(height: 20),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

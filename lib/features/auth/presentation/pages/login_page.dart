@@ -39,33 +39,30 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 70),
-          child: BlocConsumer<AuthBloc, AuthState>(
-            listener: (context, state) {
-              if (state is LoggedInState) {
-                // : TODO : navigate to home page
-              }
-            },
-            builder: (context, state) {
-              if (state is ErrorState) {
-                return Center(child: Text(state.message));
-              }
+        child: BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is LoggedInState) {
+              // : TODO : navigate to home page
+            }
+          },
+          builder: (context, state) {
+            if (state is ErrorState) {
+              return Center(child: Text(state.message));
+            }
 
-              if (state is LoadingState) {
-                return const Center(child: CircularProgressIndicator());
-              }
+            if (state is LoadingState) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-              return Column(
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 70),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Center(
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: const Color.fromARGB(255, 93, 78, 252),
@@ -133,6 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: 10),
                         TextFormField(
+                          obscureText: true,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'password is required';
@@ -191,6 +189,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   SizedBox(height: 20),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -213,9 +212,9 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ],
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
