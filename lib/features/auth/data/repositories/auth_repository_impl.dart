@@ -23,11 +23,11 @@ class AuthRepositoryImpl implements AuthRepository {
         final user = await remoteDataSource.login(email, password);
         return Right(user);
       } on ServerException {
-        return Left(ServerFailure());
+        return Left(ServerFailure(message: 'server failure'));
       }
     }
 
-    return Left(ServerFailure());
+    return Left(ServerFailure(message: 'server failure'));
   }
 
   @override
@@ -36,7 +36,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await remoteDataSource.logout();
       return Right(unit);
     } on CacheException {
-      return Left(CacheFailure());
+      return Left(ServerFailure(message: 'server failure'));
     }
   }
 
@@ -51,9 +51,9 @@ class AuthRepositoryImpl implements AuthRepository {
         final user = await remoteDataSource.signUp(name, email, password);
         return Right(user);
       } catch (e) {
-        return Left(ServerFailure());
+        return Left(ServerFailure(message: 'server failure'));
       }
     }
-    return Left(ServerFailure());
+    return Left(ServerFailure(message: 'server failure'));
   }
 }
