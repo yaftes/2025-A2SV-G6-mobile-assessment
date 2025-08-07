@@ -1,9 +1,11 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:g6_assessment/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mocktail/mocktail.dart';
+import 'auth_local_data_source_test.mocks.dart';
 
-import '../repositories/auth_repository_test.mocks.dart';
-
+@GenerateMocks([FlutterSecureStorage])
 void main() {
   Map<String, String> values = {'ACCESS_TOKEN': 'lsdkglsdlkjl'};
   late MockFlutterSecureStorage storage;
@@ -14,16 +16,13 @@ void main() {
     localDataSourceImpl = AuthLocalDataSourceImpl(storage: storage);
   });
 
-  test('verify the local data source return as we expected', () async {
-    when(() => storage.read(key: any())).thenAnswer((invocation) async {
-      final key = invocation.positionalArguments.first as String;
-      return values[key];
-    });
+  test('verify the local data source returns expected access token', () async {
+    when(
+      () => storage.read(key: 'ACCESS_TOKEN'),
+    ).thenAnswer((_) async => values['ACCESS_TOKEN']);
 
-    // ACT
     final result = await localDataSourceImpl.getAccessToken('ACCESS_TOKEN');
 
-    // ASSERT
-    expect(result, isA<String?>());
+    expect(result, equals('lsdkglsdlkjl'));
   });
 }

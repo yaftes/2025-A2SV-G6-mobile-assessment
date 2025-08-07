@@ -15,6 +15,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.logoutUsecase,
     required this.signUpUsecase,
   }) : super(InitialState()) {
+    
     // login
     on<LoginEvent>((event, emit) async {
       emit(LoadingState());
