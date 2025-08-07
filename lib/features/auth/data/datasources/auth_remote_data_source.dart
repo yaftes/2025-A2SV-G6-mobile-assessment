@@ -30,8 +30,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         body: {'email': email, 'password': password},
       );
 
+      if (response.statusCode == 401) {
+        throw ServerException(message: 'Un authorized please sign up');
+      }
+
       if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ServerException();
+        throw ServerException(message: 'unknown error from server');
       }
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -44,7 +48,37 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       return UserModel.fromJson(data['data']);
     } catch (e) {
-      throw ServerException();
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<User> loginWithToken() async {
+    final token = await localDataSource.getAccessToken(StorageKeys.accessToken);
+
+    if (token == null || token.isEmpty) {
+      throw CacheException();
+    }
+
+    try {
+      final response = await client.get(
+        Uri.parse(AuthApiConstants.userMeUrl),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 401) {
+        await localDataSource.storeAccessToken(StorageKeys.accessToken, '');
+        throw ServerException(message: 'Unauthorized, please sign in again');
+      }
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw ServerException(message: 'server failure');
+      }
+
+      final userData = jsonDecode(response.body)['data'];
+      return UserModel.fromJson(userData);
+    } catch (e) {
+      throw ServerException(message: 'server failure');
     }
   }
 
@@ -65,33 +99,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         body: {'email': email, 'password': password, 'name': name},
       );
       if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ServerException();
+        throw ServerException(message: 'server failure');
       }
       final userData = jsonDecode(response.body)['data'];
       return UserModel.fromJson(userData);
     } catch (e) {
-      throw ServerException();
+      throw ServerException(message: 'server failure');
     }
-  }
-
-  @override
-  Future<User> loginWithToken() async {
-    final token = await localDataSource.getAccessToken(StorageKeys.accessToken);
-
-    if (token == null || token.isEmpty) {
-      throw ServerException();
-    }
-
-    final response = await client.get(
-      Uri.parse(AuthApiConstants.userMeUrl),
-      headers: {'Authorization': 'Bearer $token'},
-    );
-
-    if (response.statusCode != 200 && response.statusCode != 201) {
-      throw ServerException();
-    }
-
-    final userData = jsonDecode(response.body)['data'];
-    return UserModel.fromJson(userData);
   }
 }

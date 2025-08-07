@@ -6,13 +6,9 @@ abstract class AuthState extends Equatable {
   List<Object?> get props => [];
 }
 
-class InitialState extends AuthState {}
+// initial and error states
 
-// logged in or singed in
-class UserDataFetchedState extends AuthState {
-  final User user;
-  UserDataFetchedState(this.user);
-}
+class InitialState extends AuthState {}
 
 class ErrorState extends AuthState {
   final String message;
@@ -21,4 +17,12 @@ class ErrorState extends AuthState {
 
 class LoadingState extends AuthState {}
 
+// different state for user in auth
 class LoggedOutState extends AuthState {}
+
+class SignedUpState extends AuthState {}
+
+class LoggedInState extends AuthState {
+  final User user;
+  LoggedInState(this.user);
+}

@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => LoginPage(),
+        '/': (context) => SignupPage(),
         '/signup': (context) => SignupPage(),
       },
       debugShowCheckedModeBanner: false,

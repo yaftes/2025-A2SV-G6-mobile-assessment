@@ -16,6 +16,8 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 final getIt = GetIt.instance;
 
 Future<void> init() async {
+
+  
   // External packages
   getIt.registerLazySingleton<http.Client>(() => http.Client());
   getIt.registerLazySingleton<InternetConnection>(() => InternetConnection());
@@ -57,4 +59,6 @@ Future<void> init() async {
       loginWithTokenUsecase: getIt(),
     ),
   );
+
+
 }

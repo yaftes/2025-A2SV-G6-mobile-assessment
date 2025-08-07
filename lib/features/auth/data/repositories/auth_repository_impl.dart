@@ -21,14 +21,30 @@ class AuthRepositoryImpl implements AuthRepository {
       try {
         final user = await remoteDataSource.login(email, password);
         return Right(user);
-      } on ServerException {
-        return Left(ServerFailure(message: 'server failure'));
+      } on ServerException catch (e) {
+        return Left(ServerFailure(message: e.message));
       }
     }
 
     return Left(
-      ServerFailure(message: 'please check your internet connection'),
+      ServerFailure(message: 'Please check your internet connection'),
     );
+  }
+
+  @override
+  Future<Either<Failure, User>> loginWithToken() async {
+    if (await networkInfo.isConnected) {
+      try {
+        User user = await remoteDataSource.loginWithToken();
+        return Right(user);
+      } on ServerException catch (e) {
+        return Left(ServerFailure(message: e.message));
+      } on CacheException {
+        return Left(CacheFailure(message: 'Cache failure'));
+      }
+    } else {
+      return Left(ServerFailure(message: 'No internet connection'));
+    }
   }
 
   @override
@@ -56,24 +72,15 @@ class AuthRepositoryImpl implements AuthRepository {
       try {
         final user = await remoteDataSource.signUp(name, email, password);
         return Right(user);
+      } on ServerException catch (e) {
+        return Left(ServerFailure(message: e.message));
       } catch (e) {
-        return Left(ServerFailure(message: 'server failure'));
+        return Left(ServerFailure(message: 'Unexpected error occurred'));
       }
     }
-    return Left(
-      ServerFailure(message: 'please check your internet connection'),
-    );
-  }
 
-  @override
-  Future<Either<Failure, User>> loginWithToken() async {
-    try {
-      User user = await remoteDataSource.loginWithToken();
-      return Right(user);
-    } on ServerException {
-      return Left(ServerFailure(message: ''));
-    } on CacheException {
-      return Left(CacheFailure(message: ''));
-    }
+    return Left(
+      ServerFailure(message: 'Please check your internet connection'),
+    );
   }
 }

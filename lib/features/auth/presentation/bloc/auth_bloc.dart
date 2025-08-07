@@ -18,14 +18,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.signUpUsecase,
     required this.loginWithTokenUsecase,
   }) : super(InitialState()) {
-    // login
+    // login with credential
     on<LoginEvent>((event, emit) async {
       emit(LoadingState());
       final result = await loginUsecase(event.email, event.password);
 
       result.fold(
         (failure) => emit(ErrorState(message: failure.message)),
-        (success) => emit(UserDataFetchedState(success)),
+        (success) => emit(LoggedInState(success)),
+      );
+    });
+
+    // login with token
+    on<LoginWithTokenEvent>((event, emit) async {
+      emit(LoadingState());
+      final result = await loginWithTokenUsecase();
+      result.fold(
+        (failure) => emit(ErrorState(message: failure.message)),
+        (success) => emit(LoggedInState(success)),
       );
     });
 
@@ -49,17 +59,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       result.fold(
         (failure) => emit(ErrorState(message: failure.message)),
-        (success) => emit(UserDataFetchedState(success)),
-      );
-    });
-
-    // login with token
-    on<LoginWithTokenEvent>((event, emit) async {
-      emit(LoadingState());
-      final result = await loginWithTokenUsecase();
-      result.fold(
-        (failure) => emit(ErrorState(message: failure.message)),
-        (success) => emit(UserDataFetchedState(success)),
+        (success) => emit(SignedUpState()),
       );
     });
   }

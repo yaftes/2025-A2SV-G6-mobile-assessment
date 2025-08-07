@@ -1,9 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_event.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_state.dart';
+import 'package:g6_assessment/features/auth/presentation/pages/login_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SignupPage extends StatefulWidget {
@@ -21,10 +21,20 @@ class _SignupPageState extends State<SignupPage> {
   final _confirmPasswordController = TextEditingController();
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _nameController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
         leading: Padding(
           padding: const EdgeInsets.only(left: 40),
@@ -59,7 +69,12 @@ class _SignupPageState extends State<SignupPage> {
           child: BlocConsumer<AuthBloc, AuthState>(
             listener: (context, state) {
               // : TODO if use signed in successfully navigate him to home page
-              if (state is UserDataFetchedState) {}
+              if (state is SignedUpState) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              }
             },
             builder: (context, state) {
               if (state is LoadingState) {
@@ -264,7 +279,7 @@ class _SignupPageState extends State<SignupPage> {
                               }
                             },
                             child: Text(
-                              'SIGN Up',
+                              'SIGN UP',
                               style: GoogleFonts.poppins(color: Colors.white),
                             ),
                           ),
@@ -272,27 +287,28 @@ class _SignupPageState extends State<SignupPage> {
                       ],
                     ),
                   ),
+
                   SizedBox(height: 20),
-                  Center(
-                    child: Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "Have an account ?",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                          TextSpan(
-                            onEnter: (event) {
-                              // TODO : navigate to login page
-                            },
-                            text: 'SIGN IN',
-                            style: TextStyle(
-                              color: const Color.fromARGB(255, 93, 78, 252),
-                            ),
-                          ),
-                        ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Have an account ? ",
+                        style: TextStyle(color: Colors.grey),
                       ),
-                    ),
+                      GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginPage()),
+                        ),
+                        child: Text(
+                          'SIGN IN',
+                          style: TextStyle(
+                            color: const Color.fromARGB(255, 93, 78, 252),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               );
