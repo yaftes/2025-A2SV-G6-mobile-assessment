@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:g6_assessment/features/auth/presentation/pages/login_page.dart';
 import 'package:g6_assessment/features/auth/presentation/pages/signup_page.dart';
+import 'package:g6_assessment/features/chat/presentation/pages/home_page.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -10,7 +11,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => SignupPage(),
+        '/': (context) => HomePage(),
         '/signup': (context) => SignupPage(),
       },
       debugShowCheckedModeBanner: false,
