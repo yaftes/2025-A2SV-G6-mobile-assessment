@@ -5,7 +5,6 @@ import 'package:g6_assessment/core/constants/constants.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_event.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_state.dart';
-import 'package:g6_assessment/features/auth/presentation/pages/signup_page.dart';
 import 'package:g6_assessment/features/chat/presentation/pages/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 

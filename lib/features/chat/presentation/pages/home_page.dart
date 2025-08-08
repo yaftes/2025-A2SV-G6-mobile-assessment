@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:g6_assessment/features/chat/domain/entities/chat.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:g6_assessment/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:g6_assessment/features/chat/presentation/bloc/chat_event.dart';
+import 'package:g6_assessment/features/chat/presentation/bloc/chat_state.dart';
 import 'package:g6_assessment/features/chat/presentation/widgets/custom_avatar_widget.dart';
 import 'package:g6_assessment/features/chat/presentation/widgets/custom_list_tile_widget.dart';
 
+// here we show a list of users and chats
+// a list of chat current user involved in
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -12,41 +17,70 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   @override
+  void initState() {
+    super.initState();
+    context.read<ChatBloc>().add(LoadChatEvent());
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Container(
-            height: screenHeight / 3.5,
-            decoration: BoxDecoration(color: Colors.blue),
-            child: Row(
+      body: BlocBuilder<ChatBloc, ChatState>(
+        builder: (context, state) {
+          if (state is LoadingState) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is ErrorState) {
+            return Center(child: Text(state.message));
+          } else if (state is ChatsLoadedState) {
+            final chats = state.chats;
+            return Column(
               children: [
-                CustomAvatarWidget(
-                  backgroundColor: Colors.amber,
-                  borderColor: Colors.amber,
-                  imageUrl:
-                      'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png',
-                  name: 'Yafet',
+                Container(
+                  height: screenHeight / 3.5,
+                  decoration: const BoxDecoration(color: Colors.blue),
+                  child: const Row(
+                    children: [
+                      CustomAvatarWidget(
+                        backgroundColor: Colors.amber,
+                        borderColor: Colors.amber,
+                        imageUrl:
+                            'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png',
+                        name: 'Yafet',
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 5),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
+                    ),
+                    child: ListView.builder(
+                      itemCount: chats.length,
+                      itemBuilder: (context, index) {
+                        final chat = chats[index];
+                        return CustomListTileWidget(
+                          imageUrl: '',
+                          name: chat.senderName,
+                          lastMessage: '',
+                          lastSeen: '',
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ],
-            ),
-          ),
-          Expanded(
-            child: Container(
-              margin: EdgeInsets.only(top: 5),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: ListView.builder(itemBuilder: (context, index) {}),
-            ),
-          ),
-        ],
+            );
+          }
+          return const SizedBox.shrink(); // default empty widget
+        },
       ),
     );
   }
