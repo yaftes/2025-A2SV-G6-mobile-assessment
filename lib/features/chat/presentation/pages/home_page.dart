@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:g6_assessment/features/chat/domain/entities/chat.dart';
 import 'package:g6_assessment/features/chat/presentation/widgets/custom_avatar_widget.dart';
 import 'package:g6_assessment/features/chat/presentation/widgets/custom_list_tile_widget.dart';
 
@@ -42,17 +43,7 @@ class _HomePageState extends State<HomePage> {
                   topRight: Radius.circular(20),
                 ),
               ),
-              child: Column(
-                children: [
-                  CustomListTileWidget(
-                    imageUrl:
-                        'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png',
-                    name: 'Yafet',
-                    lastMessage: 'hey bro',
-                    lastSeen: '2020',
-                  ),
-                ],
-              ),
+              child: ListView.builder(itemBuilder: (context, index) {}),
             ),
           ),
         ],
