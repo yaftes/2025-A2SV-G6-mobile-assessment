@@ -6,6 +6,7 @@ import 'package:g6_assessment/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_event.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_state.dart';
 import 'package:g6_assessment/features/auth/presentation/pages/signup_page.dart';
+import 'package:g6_assessment/features/chat/presentation/pages/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatefulWidget {
@@ -29,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void _checkTokenAndLogin() async {
     final value = await storage.read(key: StorageKeys.accessToken);
-    if (value != null && value.isNotEmpty) {
+    if (mounted && value != null && value.isNotEmpty) {
       context.read<AuthBloc>().add(LoginWithTokenEvent());
     }
   }
@@ -42,7 +43,10 @@ class _LoginPageState extends State<LoginPage> {
         child: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is LoggedInState) {
-              // : TODO : navigate to home page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
             }
           },
           builder: (context, state) {
@@ -71,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: Text(
                         'ECOM',
-                        style: GoogleFonts.aBeeZee(
+                        style: GoogleFonts.caveatBrush(
                           color: const Color.fromARGB(255, 93, 78, 252),
                           fontSize: 35,
                         ),
@@ -198,10 +202,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(color: Colors.grey),
                       ),
                       GestureDetector(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => SignupPage()),
-                        ),
+                        onTap: () => Navigator.pushNamed(context, '/sign-up'),
                         child: Text(
                           'SIGN UP',
                           style: TextStyle(

@@ -30,25 +30,36 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         body: {'email': email, 'password': password},
       );
 
-      if (response.statusCode == 401) {
-        throw ServerException(message: 'Un authorized please sign up');
+      print('response from server ${response.body}');
+
+      if (response.statusCode >= 400 && response.statusCode < 500) {
+        throw UnauthorizedException('Invalid email or password');
       }
 
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ServerException(message: 'unknown error from server');
+      if (response.statusCode >= 500) {
+        throw ServerException('Server error, please try again later');
       }
 
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      final newAccessToken = data['data']['access_token'];
+      final Map<String, dynamic> decoded = jsonDecode(response.body);
+
+      if (decoded['data'] == null || decoded['data']['access_token'] == null) {
+        throw ServerException('Access token not found in response');
+      }
+
+      final newAccessToken = decoded['data']['access_token'];
 
       await localDataSource.storeAccessToken(
         StorageKeys.accessToken,
         newAccessToken,
       );
 
-      return UserModel.fromJson(data['data']);
+      return await loginWithToken();
+    } on UnauthorizedException {
+      rethrow;
+    } on FormatException {
+      throw ServerException('Invalid JSON format from server');
     } catch (e) {
-      throw ServerException(message: e.toString());
+      throw ServerException(e.toString());
     }
   }
 
@@ -57,28 +68,38 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final token = await localDataSource.getAccessToken(StorageKeys.accessToken);
 
     if (token == null || token.isEmpty) {
-      throw CacheException();
+      throw CacheException('please login again your access token is expired');
+    }
+
+    final response = await client.get(
+      Uri.parse(AuthApiConstants.userMeUrl),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode >= 400 && response.statusCode < 500) {
+      await localDataSource.deleteAccessToken(token);
+      throw ServerException('Unauthorized, please register first');
+    }
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw ServerException(response.body);
     }
 
     try {
-      final response = await client.get(
-        Uri.parse(AuthApiConstants.userMeUrl),
-        headers: {'Authorization': 'Bearer $token'},
-      );
+      final Map<String, dynamic> decoded = jsonDecode(response.body);
+      final data = decoded['data'];
 
-      if (response.statusCode == 401) {
-        await localDataSource.storeAccessToken(StorageKeys.accessToken, '');
-        throw ServerException(message: 'Unauthorized, please sign in again');
+      if (data == null && response.statusCode == 200) {
+        // we assue here the status code
+        // await localDataSource.deleteAccessToken(StorageKeys.accessToken);
+        return User();
       }
 
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ServerException(message: 'server failure');
-      }
-
-      final userData = jsonDecode(response.body)['data'];
-      return UserModel.fromJson(userData);
+      return User(id: data['_id'], name: data['name'], email: data['email']);
+    } on FormatException catch (_) {
+      throw ServerException('Invalid JSON from server');
     } catch (e) {
-      throw ServerException(message: 'server failure');
+      throw ServerException(e.toString());
     }
   }
 
@@ -98,13 +119,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         Uri.parse(AuthApiConstants.registerUrl),
         body: {'email': email, 'password': password, 'name': name},
       );
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ServerException(message: 'server failure');
+
+      if (response.statusCode == 409) {
+        throw ServerException('User already exists, please try to login');
       }
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw ServerException('Server failure');
+      }
+
       final userData = jsonDecode(response.body)['data'];
       return UserModel.fromJson(userData);
+    } on ServerException {
+      rethrow;
+    } on FormatException {
+      throw ServerException('Invalid JSON from server');
     } catch (e) {
-      throw ServerException(message: 'server failure');
+      throw ServerException(e.toString());
     }
   }
 }

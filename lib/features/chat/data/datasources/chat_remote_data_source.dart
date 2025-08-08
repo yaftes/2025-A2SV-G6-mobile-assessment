@@ -35,10 +35,10 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ServerException(message: response.body);
+        throw ServerException(response.body);
       }
     } catch (e) {
-      throw ServerException(message: '');
+      throw ServerException('');
     }
   }
 
@@ -57,13 +57,13 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ServerException(message: response.body);
+        throw ServerException(response.body);
       }
 
       final jsonData = jsonDecode(response.body);
 
       if (jsonData['statusCode'] != 200) {
-        throw ServerException(message: jsonData['message'] ?? 'Unknown error');
+        throw ServerException(jsonData['message'] ?? 'Unknown error');
       }
 
       final List<dynamic> messagesJson = jsonData['data'];
@@ -81,7 +81,7 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
 
       return messages;
     } catch (e) {
-      throw ServerException(message: e.toString());
+      throw ServerException(e.toString());
     }
   }
 
@@ -100,10 +100,10 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ServerException(message: response.body);
+        throw ServerException(response.body);
       }
     } catch (e) {
-      throw ServerException(message: '');
+      throw ServerException('');
     }
   }
 
@@ -122,7 +122,7 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ServerException(message: response.body);
+        throw ServerException(response.body);
       }
 
       final Map<String, dynamic> decoded = jsonDecode(response.body);
@@ -136,7 +136,7 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
         receiverName: chatData['user2']['name'],
       );
     } catch (e) {
-      throw ServerException(message: '');
+      throw ServerException('');
     }
   }
 
@@ -155,7 +155,7 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ServerException(message: response.body);
+        throw ServerException(response.body);
       }
 
       final Map<String, dynamic> decoded = jsonDecode(response.body);

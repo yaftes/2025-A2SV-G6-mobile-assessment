@@ -12,8 +12,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => ChatMessagePage(),
-        '/signup': (context) => SignupPage(),
+        '/': (context) => LoginPage(),
+        '/sign-up': (context) => SignupPage(),
+        '/home': (context) => HomePage(),
+        '/chat': (context) => ChatMessagePage(),
       },
       debugShowCheckedModeBanner: false,
     );

@@ -1,5 +1,3 @@
-import 'package:g6_assessment/features/chat/domain/entities/message.dart';
-
 class Chat {
   String chatId;
   String senderId;

@@ -38,7 +38,12 @@ class _SignupPageState extends State<SignupPage> {
         backgroundColor: Colors.white,
         leading: Padding(
           padding: const EdgeInsets.only(left: 40),
-          child: Icon(Icons.arrow_back_ios_new),
+          child: IconButton(
+            onPressed: () {
+              Navigator.popAndPushNamed(context, 'sign-up');
+            },
+            icon: Icon(Icons.arrow_back_ios_new),
+          ),
         ),
         actions: [
           Padding(
@@ -53,7 +58,7 @@ class _SignupPageState extends State<SignupPage> {
               ),
               child: Text(
                 'ECOM',
-                style: GoogleFonts.caladea(
+                style: GoogleFonts.caveatBrush(
                   color: const Color.fromARGB(255, 93, 78, 252),
                   fontSize: 20,
                 ),

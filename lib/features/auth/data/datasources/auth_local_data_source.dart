@@ -4,6 +4,7 @@ import 'package:g6_assessment/core/error/exceptions.dart';
 abstract class AuthLocalDataSource {
   Future<String?> getAccessToken(String userInfo);
   Future<void> storeAccessToken(String key, String accessToken);
+  Future<void> deleteAccessToken(String key);
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
@@ -24,6 +25,15 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   Future<void> storeAccessToken(String key, String accessToken) async {
     try {
       await storage.write(key: key, value: accessToken);
+    } catch (e) {
+      throw CacheException();
+    }
+  }
+
+  @override
+  Future<void> deleteAccessToken(String key) async {
+    try {
+      await storage.delete(key: key);
     } catch (e) {
       throw CacheException();
     }
