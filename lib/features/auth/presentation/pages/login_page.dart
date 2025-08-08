@@ -5,7 +5,7 @@ import 'package:g6_assessment/core/constants/constants.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_event.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_state.dart';
-import 'package:g6_assessment/features/chat/presentation/pages/home_page.dart';
+import 'package:g6_assessment/features/auth/presentation/widgets/custom_textfield.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatefulWidget {
@@ -35,6 +35,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -42,10 +49,7 @@ class _LoginPageState extends State<LoginPage> {
         child: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is LoggedInState) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage()),
-              );
+              Navigator.pushNamed(context, '/home');
             }
           },
           builder: (context, state) {
@@ -54,144 +58,119 @@ class _LoginPageState extends State<LoginPage> {
             }
 
             if (state is LoadingState) {
-              return const Center(child: CircularProgressIndicator());
+              return SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: double.infinity,
+                child: Center(child: CircularProgressIndicator()),
+              );
             }
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 70),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Center(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color.fromARGB(255, 93, 78, 252),
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Text(
-                        'ECOM',
-                        style: GoogleFonts.caveatBrush(
-                          color: const Color.fromARGB(255, 93, 78, 252),
-                          fontSize: 35,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 50),
-                  Center(
-                    child: Text(
-                      'Sign into your account',
-                      style: GoogleFonts.poppins(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 30),
-                  Form(
-                    key: formkey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Email',
-                          style: GoogleFonts.poppins(color: Colors.grey),
-                        ),
-                        SizedBox(height: 10),
-                        TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'email is required';
-                            }
-                            return null;
-                          },
-                          style: TextStyle(color: Colors.black),
-                          controller: _emailController,
-                          decoration: InputDecoration(
-                            hintText: 'ex: john@gmail.com',
-                            hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                            fillColor: const Color.fromARGB(255, 241, 239, 239),
-                            filled: true,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 15,
-                              vertical: 10,
+                  Column(
+                    children: [
+                      Center(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 0,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: const Color.fromARGB(255, 93, 78, 252),
                             ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'ECOM',
+                            style: GoogleFonts.caveatBrush(
+                              color: const Color.fromARGB(255, 93, 78, 252),
+                              fontSize: 35,
                             ),
                           ),
                         ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Password',
-                          style: GoogleFonts.poppins(color: Colors.grey),
-                        ),
-                        SizedBox(height: 10),
-                        TextFormField(
-                          obscureText: true,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'password is required';
-                            }
-                            return null;
-                          },
-                          style: TextStyle(color: Colors.black),
-                          controller: _passwordController,
-                          decoration: InputDecoration(
-                            hintText: '*********',
-                            hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                            fillColor: const Color.fromARGB(255, 241, 239, 239),
-                            filled: true,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 15,
-                              vertical: 10,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
+                      ),
+                      SizedBox(height: 50),
+                      Center(
+                        child: Text(
+                          'Sign into your account',
+                          style: GoogleFonts.poppins(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        SizedBox(height: 40),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(
-                                255,
-                                93,
-                                78,
-                                252,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                      ),
+                      SizedBox(height: 30),
+                      Form(
+                        key: formkey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Email',
+                              style: GoogleFonts.poppins(color: Colors.grey),
                             ),
-                            onPressed: () {
-                              if (formkey.currentState!.validate()) {
-                                context.read<AuthBloc>().add(
-                                  LoginEvent(
-                                    _emailController.text,
-                                    _passwordController.text,
+                            SizedBox(height: 10),
+                            CustomTextfield(
+                              controller: _emailController,
+                              hintText: 'ex : john@gmail.com',
+                              labelName: 'email',
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              'Password',
+                              style: GoogleFonts.poppins(color: Colors.grey),
+                            ),
+                            SizedBox(height: 10),
+                            CustomTextfield(
+                              controller: _passwordController,
+                              hintText: '*********',
+                              labelName: 'password',
+                              obscureText: true,
+                            ),
+                            SizedBox(height: 40),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color.fromARGB(
+                                    255,
+                                    93,
+                                    78,
+                                    252,
                                   ),
-                                );
-                              }
-                            },
-                            child: Text(
-                              'SIGN IN',
-                              style: GoogleFonts.poppins(color: Colors.white),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  if (formkey.currentState!.validate()) {
+                                    context.read<AuthBloc>().add(
+                                      LoginEvent(
+                                        _emailController.text,
+                                        _passwordController.text,
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: Text(
+                                  'SIGN IN',
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(height: 20),
+                    ],
                   ),
-                  SizedBox(height: 20),
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

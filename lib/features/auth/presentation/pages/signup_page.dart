@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_event.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_state.dart';
-import 'package:g6_assessment/features/auth/presentation/pages/login_page.dart';
+import 'package:g6_assessment/features/auth/presentation/widgets/custom_textfield.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SignupPage extends StatefulWidget {
@@ -19,6 +19,8 @@ class _SignupPageState extends State<SignupPage> {
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  bool isSelected = false;
 
   @override
   void dispose() {
@@ -71,19 +73,14 @@ class _SignupPageState extends State<SignupPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 70),
 
-          child: BlocConsumer<AuthBloc, AuthState>(
-            listener: (context, state) {
-              // : TODO if use signed in successfully navigate him to home page
-              if (state is SignedUpState) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                );
-              }
-            },
+          child: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
               if (state is LoadingState) {
-                return Center(child: CircularProgressIndicator());
+                return SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  width: double.infinity,
+                  child: Center(child: CircularProgressIndicator()),
+                );
               } else if (state is ErrorState) {
                 return Center(child: Text(state.message));
               }
@@ -112,30 +109,10 @@ class _SignupPageState extends State<SignupPage> {
                           style: GoogleFonts.poppins(color: Colors.grey),
                         ),
                         SizedBox(height: 10),
-                        TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'name is required';
-                            }
-                            return null;
-                          },
-
-                          style: TextStyle(color: Colors.black),
+                        CustomTextfield(
                           controller: _nameController,
-                          decoration: InputDecoration(
-                            hintText: 'ex: john smith',
-                            hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                            fillColor: const Color.fromARGB(255, 241, 239, 239),
-                            filled: true,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 15,
-                              vertical: 10,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
+                          hintText: 'ex: john smith',
+                          labelName: 'name',
                         ),
                         SizedBox(height: 10),
                         Text(
@@ -143,29 +120,10 @@ class _SignupPageState extends State<SignupPage> {
                           style: GoogleFonts.poppins(color: Colors.grey),
                         ),
                         SizedBox(height: 10),
-                        TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'email is required';
-                            }
-                            return null;
-                          },
-                          style: TextStyle(color: Colors.black),
+                        CustomTextfield(
                           controller: _emailController,
-                          decoration: InputDecoration(
-                            hintText: 'ex: john@gmail.com',
-                            hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                            fillColor: const Color.fromARGB(255, 241, 239, 239),
-                            filled: true,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 15,
-                              vertical: 10,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
+                          hintText: 'ex: john@gmail.com',
+                          labelName: 'name',
                         ),
                         SizedBox(height: 10),
                         Text(
@@ -174,30 +132,11 @@ class _SignupPageState extends State<SignupPage> {
                           style: GoogleFonts.poppins(color: Colors.grey),
                         ),
                         SizedBox(height: 10),
-                        TextFormField(
-                          obscureText: true,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'password is required';
-                            }
-                            return null;
-                          },
-                          style: TextStyle(color: Colors.black),
+                        CustomTextfield(
                           controller: _passwordController,
-                          decoration: InputDecoration(
-                            hintText: '*********',
-                            hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                            fillColor: const Color.fromARGB(255, 241, 239, 239),
-                            filled: true,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 15,
-                              vertical: 10,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
+                          hintText: '************',
+                          labelName: 'password',
+                          obscureText: true,
                         ),
                         SizedBox(height: 10),
                         Text(
@@ -206,40 +145,22 @@ class _SignupPageState extends State<SignupPage> {
                           style: GoogleFonts.poppins(color: Colors.grey),
                         ),
                         SizedBox(height: 10),
-                        TextFormField(
-                          obscureText: true,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'email is required';
-                            }
-
-                            return null;
-                          },
-                          style: TextStyle(color: Colors.black),
+                        CustomTextfield(
                           controller: _confirmPasswordController,
-                          decoration: InputDecoration(
-                            hintText: '*********',
-                            hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                            fillColor: const Color.fromARGB(255, 241, 239, 239),
-                            filled: true,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 15,
-                              vertical: 10,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
+                          hintText: '*******',
+                          labelName: 'confirm password',
+                          obscureText: true,
                         ),
 
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Checkbox(
-                              value: true,
+                              value: isSelected,
                               onChanged: (value) {
-                                setState(() {});
+                                setState(() {
+                                  isSelected = value!;
+                                });
                               },
                               activeColor: const Color.fromARGB(
                                 255,
@@ -275,7 +196,8 @@ class _SignupPageState extends State<SignupPage> {
                               ),
                             ),
                             onPressed: () {
-                              if (formkey.currentState!.validate()) {
+                              if (formkey.currentState!.validate() &&
+                                  isSelected) {
                                 context.read<AuthBloc>().add(
                                   SignUpEvent(
                                     _nameController.text,
@@ -305,10 +227,7 @@ class _SignupPageState extends State<SignupPage> {
                         style: TextStyle(color: Colors.grey),
                       ),
                       GestureDetector(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => LoginPage()),
-                        ),
+                        onTap: () => Navigator.pushNamed(context, '/'),
                         child: Text(
                           'SIGN IN',
                           style: TextStyle(

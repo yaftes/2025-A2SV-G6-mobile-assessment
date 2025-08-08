@@ -62,18 +62,25 @@ class _HomePageState extends State<HomePage> {
                         topRight: Radius.circular(20),
                       ),
                     ),
-                    child: ListView.builder(
-                      itemCount: chats.length,
-                      itemBuilder: (context, index) {
-                        final chat = chats[index];
-                        return CustomListTileWidget(
-                          imageUrl: '',
-                          name: chat.senderName,
-                          lastMessage: '',
-                          lastSeen: '',
-                        );
-                      },
-                    ),
+                    child: chats.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'No Available chats for now',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: chats.length,
+                            itemBuilder: (context, index) {
+                              final chat = chats[index];
+                              return CustomListTileWidget(
+                                imageUrl: '',
+                                name: chat.senderName,
+                                lastMessage: '',
+                                lastSeen: '',
+                              );
+                            },
+                          ),
                   ),
                 ),
               ],

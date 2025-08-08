@@ -11,6 +11,7 @@ import 'package:g6_assessment/features/auth/domain/usecases/signup_usecase.dart'
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:g6_assessment/features/chat/data/datasources/chat_remote_data_source.dart';
 import 'package:g6_assessment/features/chat/data/repositories/chat_repository_impl.dart';
+import 'package:g6_assessment/features/chat/domain/repositories/chat_repository.dart';
 import 'package:g6_assessment/features/chat/domain/usecases/delete_chat_usecase.dart';
 import 'package:g6_assessment/features/chat/domain/usecases/get_messages_usecase.dart';
 import 'package:g6_assessment/features/chat/domain/usecases/initiate_chat_usecase.dart';
@@ -67,10 +68,14 @@ Future<void> init() async {
   );
 
   // register remote data source
-  getIt.registerLazySingleton(() => ChatRemoteDataSourceImpl(getIt(), getIt()));
+  getIt.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSourceImpl(getIt(), getIt()),
+  );
 
   // register the repository
-  getIt.registerLazySingleton(() => ChatRepositoryImpl(getIt(), getIt()));
+  getIt.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(getIt(), getIt()),
+  );
 
   // register chat usecases
   getIt.registerLazySingleton(() => MyChatByIdUsecase(getIt()));
