@@ -1,4 +1,6 @@
+import 'dart:io' as IO;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:g6_assessment/core/constants/constants.dart';
 import 'package:g6_assessment/core/platform/network_info.dart';
 import 'package:g6_assessment/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:g6_assessment/features/auth/data/datasources/auth_remote_data_source.dart';
@@ -22,6 +24,7 @@ import 'package:g6_assessment/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 final getIt = GetIt.instance;
 
@@ -30,13 +33,20 @@ Future<void> init() async {
   getIt.registerLazySingleton<http.Client>(() => http.Client());
   getIt.registerLazySingleton<InternetConnection>(() => InternetConnection());
   getIt.registerLazySingleton<FlutterSecureStorage>(
-    () => FlutterSecureStorage(),
+    () => const FlutterSecureStorage(),
   );
+
+  // Setup socket.io client without token initially
+  final socket = IO.io(
+    ChatApiConstants.forSocket,
+    IO.OptionBuilder().setTransports(['websocket']).enableForceNew().build(),
+  );
+  getIt.registerSingleton<IO.Socket>(socket);
 
   // Core
   getIt.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(getIt()));
 
-  // data sources
+  // Data sources
   getIt.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSourceImpl(storage: getIt()),
   );
@@ -53,13 +63,13 @@ Future<void> init() async {
     ),
   );
 
-  // use cases
+  // Use cases
   getIt.registerLazySingleton(() => LoginUsecase(getIt()));
   getIt.registerLazySingleton(() => LogoutUsecase(getIt()));
   getIt.registerLazySingleton(() => SignUpUsecase(getIt()));
   getIt.registerLazySingleton(() => LoginWithTokenUsecase(getIt()));
 
-  // register auth bloc
+  // Auth BLoC
   getIt.registerFactory(
     () => AuthBloc(
       loginUsecase: getIt(),
@@ -69,17 +79,17 @@ Future<void> init() async {
     ),
   );
 
-  // register remote data source
+  // Chat data source
   getIt.registerLazySingleton<ChatRemoteDataSource>(
     () => ChatRemoteDataSourceImpl(getIt(), getIt()),
   );
 
-  // register the repository
+  // Chat repository
   getIt.registerLazySingleton<ChatRepository>(
-    () => ChatRepositoryImpl(getIt(), getIt()),
+    () => ChatRepositoryImpl(getIt(), getIt(), getIt()),
   );
 
-  // register chat usecases
+  // Chat use cases
   getIt.registerLazySingleton(() => MyChatByIdUsecase(getIt()));
   getIt.registerLazySingleton(() => MyChatsUsecase(getIt()));
   getIt.registerLazySingleton(() => DeleteChatUsecase(getIt()));
@@ -87,7 +97,7 @@ Future<void> init() async {
   getIt.registerLazySingleton(() => InitiateChatUsecase(getIt()));
   getIt.registerLazySingleton(() => GetAllUsersUsecase(getIt()));
 
-  // register chat bloc
+  // Chat BLoC
   getIt.registerFactory(
     () => ChatBloc(
       deleteChatUsecase: getIt(),

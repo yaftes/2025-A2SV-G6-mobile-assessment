@@ -16,4 +16,15 @@ abstract class ChatRepository {
   Future<Either<Failure, Unit>> deleteChat(String chatId);
 
   Future<Either<Failure, List<User>>> getAllUsers();
+
+  Future<Either<Failure, Unit>> connectSocket(String token);
+  Future<Either<Failure, Unit>> disconnectSocket();
+  Future<Either<Failure, Unit>> sendMessage(
+    String chatId,
+    String content, {
+    String type = 'text',
+  });
+
+  void onMessageReceived(Function(Message) callback);
+  void onMessageDelivered(Function(Message) callback);
 }

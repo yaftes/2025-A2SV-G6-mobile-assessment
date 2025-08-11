@@ -4,6 +4,8 @@ import 'package:g6_assessment/core/error/failures.dart';
 import 'package:g6_assessment/core/platform/network_info.dart';
 import 'package:g6_assessment/features/auth/domain/entities/user.dart';
 import 'package:g6_assessment/features/chat/data/datasources/chat_remote_data_source.dart';
+import 'package:g6_assessment/features/chat/data/datasources/socket_service.dart';
+import 'package:g6_assessment/features/chat/data/models/message_model.dart';
 import 'package:g6_assessment/features/chat/domain/entities/chat.dart';
 import 'package:g6_assessment/features/chat/domain/entities/message.dart';
 import 'package:g6_assessment/features/chat/domain/repositories/chat_repository.dart';
@@ -11,7 +13,12 @@ import 'package:g6_assessment/features/chat/domain/repositories/chat_repository.
 class ChatRepositoryImpl implements ChatRepository {
   final ChatRemoteDataSource remoteDataSource;
   final NetworkInfo networkInfo;
-  ChatRepositoryImpl(this.remoteDataSource, this.networkInfo);
+  final SocketService socketService;
+  ChatRepositoryImpl(
+    this.remoteDataSource,
+    this.networkInfo,
+    this.socketService,
+  );
   @override
   Future<Either<Failure, Unit>> deleteChat(String chatId) async {
     if (await networkInfo.isConnected) {
@@ -94,5 +101,56 @@ class ChatRepositoryImpl implements ChatRepository {
       }
     }
     return Left(ServerFailure(message: 'Please Connect to internet'));
+  }
+
+  @override
+  Future<Either<Failure, Unit>> connectSocket(String token) async {
+    try {
+      await socketService.connect(token);
+      return const Right(unit);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> disconnectSocket() async {
+    try {
+      await socketService.disconnect();
+      return const Right(unit);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> sendMessage(
+    String chatId,
+    String content, {
+    String type = 'text',
+  }) async {
+    try {
+      socketService.sendMessage(chatId: chatId, content: content, type: type);
+      return const Right(unit);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  void onMessageReceived(Function(Message) callback) {
+    socketService.onMessageReceived((data) {
+      // Convert raw data to Message entity before callback
+      final message = MessageModel.fromJson(data);
+      callback(message);
+    });
+  }
+
+  @override
+  void onMessageDelivered(Function(Message) callback) {
+    socketService.onMessageDelivered((data) {
+      final message = MessageModel.fromJson(data);
+      callback(message);
+    });
   }
 }
