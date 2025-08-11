@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => LoginPage(),
         '/sign-up': (context) => SignupPage(),
         '/home': (context) => HomePage(),
-        '/chat': (context) => ChatMessagePage(),
+        '/chat': (context) => ChatRoomPage(),
       },
       debugShowCheckedModeBanner: false,
     );

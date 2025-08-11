@@ -28,15 +28,18 @@ class CustomListTileWidget extends StatelessWidget {
         children: [
           Text(lastSeen, style: TextStyle(color: Colors.grey)),
           if (unReadMessage != null)
-            SizedBox(
-              width: 15,
-              height: 15,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.blueAccent,
-                  borderRadius: BorderRadius.circular(15),
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: Colors.blueAccent,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Center(
+                child: Text(
+                  unReadMessage.toString(),
+                  style: TextStyle(color: Colors.white),
                 ),
-                child: Text(unReadMessage.toString()),
               ),
             ),
         ],
