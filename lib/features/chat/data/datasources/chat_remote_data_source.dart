@@ -13,7 +13,7 @@ abstract class ChatRemoteDataSource {
   Future<List<Chat>> myChats();
   Future<Chat> myChatById(String chatId);
   Future<List<Message>> getChatMessages(String chatId);
-  Future<void> initiateChat(String receiverId);
+  Future<List<Chat>> initiateChat(String receiverId);
   Future<void> deleteChat(String chatId);
 
   Future<List<User>> getAllUsers();
@@ -90,7 +90,7 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
   }
 
   @override
-  Future<void> initiateChat(String receiverId) async {
+  Future<List<Chat>> initiateChat(String receiverId) async {
     try {
       final token = await storage.read(key: StorageKeys.accessToken);
 
@@ -98,16 +98,22 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
         throw CacheException();
       }
 
-      final response = await client.get(
+      final response = await client.post(
         Uri.parse(ChatApiConstants.chatUrl),
-        headers: {'Authorization': 'Bearer $token'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'userId': receiverId}),
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw ServerException(response.body);
       }
+
+      return await myChats();
     } catch (e) {
-      throw ServerException('');
+      throw ServerException(e.toString());
     }
   }
 
@@ -203,7 +209,15 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
       final decoded = jsonDecode(response.body) as Map<String, dynamic>;
       final List<dynamic> usersJson = decoded['data'];
 
-      return usersJson.map((user) => UserModel.fromJson(user)).toList();
+      return usersJson
+          .map(
+            (user) => UserModel(
+              id: user['_id'],
+              name: user['name'],
+              email: user['email'],
+            ),
+          )
+          .toList();
     } catch (e) {
       throw ServerException(e.toString());
     }

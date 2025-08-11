@@ -13,6 +13,7 @@ import 'package:g6_assessment/features/chat/data/datasources/chat_remote_data_so
 import 'package:g6_assessment/features/chat/data/repositories/chat_repository_impl.dart';
 import 'package:g6_assessment/features/chat/domain/repositories/chat_repository.dart';
 import 'package:g6_assessment/features/chat/domain/usecases/delete_chat_usecase.dart';
+import 'package:g6_assessment/features/chat/domain/usecases/get_all_users_usecase.dart';
 import 'package:g6_assessment/features/chat/domain/usecases/get_messages_usecase.dart';
 import 'package:g6_assessment/features/chat/domain/usecases/initiate_chat_usecase.dart';
 import 'package:g6_assessment/features/chat/domain/usecases/my_chat_by_id_usecase.dart';
@@ -25,8 +26,6 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 final getIt = GetIt.instance;
 
 Future<void> init() async {
-
-
   // External packages
   getIt.registerLazySingleton<http.Client>(() => http.Client());
   getIt.registerLazySingleton<InternetConnection>(() => InternetConnection());
@@ -34,7 +33,6 @@ Future<void> init() async {
     () => FlutterSecureStorage(),
   );
 
-  
   // Core
   getIt.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(getIt()));
 
@@ -87,6 +85,7 @@ Future<void> init() async {
   getIt.registerLazySingleton(() => DeleteChatUsecase(getIt()));
   getIt.registerLazySingleton(() => GetMessagesUsecase(getIt()));
   getIt.registerLazySingleton(() => InitiateChatUsecase(getIt()));
+  getIt.registerLazySingleton(() => GetAllUsersUsecase(getIt()));
 
   // register chat bloc
   getIt.registerFactory(
@@ -96,6 +95,7 @@ Future<void> init() async {
       initiateChatUsecase: getIt(),
       myChatByIdUsecase: getIt(),
       myChatsUsecase: getIt(),
+      getAllUsersUsecase: getIt(),
     ),
   );
 }

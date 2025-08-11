@@ -6,13 +6,6 @@ import 'package:g6_assessment/features/auth/presentation/bloc/auth_state.dart';
 import 'package:g6_assessment/features/auth/presentation/widgets/custom_textfield.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/* we hold the user on auth gate
-- if we got token -> then request using that token
- - not an internet connection or no token naviagate to login
-- inside login page if there is no interenet connection - don't show the 
-- login button same with sign up page
-
-*/
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
 
@@ -26,6 +19,7 @@ class _SignupPageState extends State<SignupPage> {
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  bool isConnected = true;
 
   bool isSelected = false;
 
@@ -80,7 +74,18 @@ class _SignupPageState extends State<SignupPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 70),
 
-          child: BlocBuilder<AuthBloc, AuthState>(
+          child: BlocConsumer<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is SignedUpState) {
+                Navigator.pushNamed(context, '/');
+              }
+              if (state is DisConnectedState) {
+                isConnected = false;
+              }
+              if (state is ConnectedState) {
+                isConnected = true;
+              }
+            },
             builder: (context, state) {
               if (state is LoadingState) {
                 return SizedBox(
@@ -194,35 +199,57 @@ class _SignupPageState extends State<SignupPage> {
                         SizedBox(height: 40),
                         SizedBox(
                           width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(
-                                255,
-                                93,
-                                78,
-                                252,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadiusGeometry.circular(10),
-                              ),
-                            ),
-                            onPressed: () {
-                              if (formkey.currentState!.validate() &&
-                                  isSelected) {
-                                context.read<AuthBloc>().add(
-                                  SignUpEvent(
-                                    _nameController.text,
-                                    _emailController.text,
-                                    _passwordController.text,
+                          child: isConnected
+                              ? ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color.fromARGB(
+                                      255,
+                                      93,
+                                      78,
+                                      252,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadiusGeometry.circular(10),
+                                    ),
                                   ),
-                                );
-                              }
-                            },
-                            child: Text(
-                              'SIGN UP',
-                              style: GoogleFonts.poppins(color: Colors.white),
-                            ),
-                          ),
+                                  onPressed: () {
+                                    if (formkey.currentState!.validate() &&
+                                        isSelected) {
+                                      context.read<AuthBloc>().add(
+                                        SignUpEvent(
+                                          _nameController.text,
+                                          _emailController.text,
+                                          _passwordController.text,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: Text(
+                                    'SIGN UP',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  padding: EdgeInsets.symmetric(vertical: 10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: const Color.fromARGB(
+                                      255,
+                                      93,
+                                      78,
+                                      252,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'Please connect to internet first',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
                         ),
                       ],
                     ),

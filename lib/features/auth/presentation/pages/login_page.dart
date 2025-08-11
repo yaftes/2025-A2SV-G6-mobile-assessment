@@ -20,6 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final FlutterSecureStorage storage = FlutterSecureStorage();
+  bool isConnected = true;
 
   @override
   void initState() {
@@ -51,6 +52,12 @@ class _LoginPageState extends State<LoginPage> {
             if (state is LoggedInState) {
               Navigator.pushNamed(context, '/home');
             }
+            if (state is DisConnectedState) {
+              isConnected = false;
+            }
+            if (state is ConnectedState) {
+              isConnected = true;
+            }
           },
           builder: (context, state) {
             if (state is ErrorState) {
@@ -68,6 +75,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: Center(child: CircularProgressIndicator()),
               );
             }
+
+            // let me do something
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 70),
@@ -139,35 +148,65 @@ class _LoginPageState extends State<LoginPage> {
                             SizedBox(height: 40),
                             SizedBox(
                               width: double.infinity,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color.fromARGB(
-                                    255,
-                                    93,
-                                    78,
-                                    252,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  if (formkey.currentState!.validate()) {
-                                    context.read<AuthBloc>().add(
-                                      LoginEvent(
-                                        _emailController.text,
-                                        _passwordController.text,
+                              child: isConnected
+                                  ? ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color.fromARGB(
+                                          255,
+                                          93,
+                                          78,
+                                          252,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
                                       ),
-                                    );
-                                  }
-                                },
-                                child: Text(
-                                  'SIGN IN',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
+                                      onPressed: () {
+                                        if (formkey.currentState!.validate()) {
+                                          context.read<AuthBloc>().add(
+                                            LoginEvent(
+                                              _emailController.text,
+                                              _passwordController.text,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: Text(
+                                        'SIGN IN',
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    )
+                                  : SizedBox(
+                                      width: double.infinity,
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 10,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                          color: const Color.fromARGB(
+                                            255,
+                                            93,
+                                            78,
+                                            252,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'Please connect to internet first',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                             ),
                           ],
                         ),

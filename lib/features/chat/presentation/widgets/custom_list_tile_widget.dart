@@ -27,7 +27,11 @@ class CustomListTileWidget extends StatelessWidget {
           if (unReadMessage != null)
             Container(
               padding: EdgeInsets.all(2),
-              decoration: BoxDecoration(color: Colors.blueAccent),
+
+              decoration: BoxDecoration(
+                color: Colors.blueAccent,
+                borderRadius: BorderRadius.circular(15),
+              ),
               child: Text(unReadMessage.toString()),
             ),
         ],

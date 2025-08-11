@@ -11,7 +11,7 @@ abstract class ChatRepository {
 
   Future<Either<Failure, List<Message>>> getChatMessages(String chatId);
 
-  Future<Either<Failure, Unit>> initiateChat(String receiverId);
+  Future<Either<Failure, List<Chat>>> initiateChat(String receiverId);
 
   Future<Either<Failure, Unit>> deleteChat(String chatId);
 

@@ -40,11 +40,11 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> initiateChat(String receiverId) async {
+  Future<Either<Failure, List<Chat>>> initiateChat(String receiverId) async {
     if (await networkInfo.isConnected) {
       try {
-        remoteDataSource.initiateChat(receiverId);
-        return Right(unit);
+        final result = await remoteDataSource.initiateChat(receiverId);
+        return Right(result);
       } on ServerException catch (e) {
         return Left(ServerFailure(message: e.message));
       }
