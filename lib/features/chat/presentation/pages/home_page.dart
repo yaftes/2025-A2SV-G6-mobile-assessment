@@ -122,10 +122,6 @@ class _HomePageState extends State<HomePage> {
                             itemBuilder: (context, index) {
                               final chat = chats[index];
 
-                              /* : TODO
-                              so here we extract the chatroom id and we navigate to 
-                              a detail page for chat message page 
-                              */
                               return CustomListTileWidget(
                                 imageUrl:
                                     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjDGMp734S91sDuUFqL51_xRTXS15iiRoHew&s',
@@ -133,6 +129,13 @@ class _HomePageState extends State<HomePage> {
                                 lastMessage: 'last message',
                                 lastSeen: '2 min ago',
                                 unReadMessage: 3,
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/chat',
+                                    arguments: chat,
+                                  );
+                                },
                               );
                             },
                           );

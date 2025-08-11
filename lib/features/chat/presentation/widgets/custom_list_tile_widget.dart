@@ -6,10 +6,12 @@ class CustomListTileWidget extends StatelessWidget {
   final String lastMessage;
   final String lastSeen;
   final int? unReadMessage;
+  final void Function() onTap;
   const CustomListTileWidget({
     required this.imageUrl,
     required this.name,
     required this.lastMessage,
+    required this.onTap,
     required this.lastSeen,
     this.unReadMessage,
     super.key,
@@ -18,6 +20,7 @@ class CustomListTileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: onTap,
       leading: CircleAvatar(backgroundImage: NetworkImage(imageUrl)),
       title: Text(name, style: TextStyle(fontSize: 16)),
       subtitle: Text(lastMessage, style: TextStyle(color: Colors.grey)),
@@ -25,14 +28,16 @@ class CustomListTileWidget extends StatelessWidget {
         children: [
           Text(lastSeen, style: TextStyle(color: Colors.grey)),
           if (unReadMessage != null)
-            Container(
-              padding: EdgeInsets.all(2),
-
-              decoration: BoxDecoration(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.circular(15),
+            SizedBox(
+              width: 15,
+              height: 15,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Text(unReadMessage.toString()),
               ),
-              child: Text(unReadMessage.toString()),
             ),
         ],
       ),

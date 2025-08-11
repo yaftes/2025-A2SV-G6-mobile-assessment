@@ -73,14 +73,7 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
       final List<dynamic> messagesJson = jsonData['data'];
 
       final messages = messagesJson.map((msg) {
-        return Message(
-          id: msg['_id'],
-          senderId: msg['sender']['_id'],
-          receiverId: msg['chat']['user1']['_id'] == msg['sender']['_id']
-              ? msg['chat']['user2']['_id']
-              : msg['chat']['user1']['_id'],
-          text: msg['content'],
-        );
+        return Message(id: msg['_id'], text: msg['content']);
       }).toList();
 
       return messages;

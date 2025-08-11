@@ -8,3 +8,8 @@ class InitiateChatEvent extends ChatEvent {
   final String userId;
   InitiateChatEvent(this.userId);
 }
+
+class LoadAllChatMessages extends ChatEvent {
+  String chatId;
+  LoadAllChatMessages(this.chatId);
+}

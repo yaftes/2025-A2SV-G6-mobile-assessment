@@ -50,5 +50,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         (success) => emit(ChatsLoadedState(chats: success)),
       );
     });
+
+    on<LoadAllChatMessages>((event, emit) async {
+      emit(LoadingState());
+      final result = await getMessagesUsecase(event.chatId);
+      result.fold(
+        (failure) => emit(ErrorState(message: failure.message)),
+        (success) => emit(GetChatMessagesState(success)),
+      );
+    });
   }
 }
