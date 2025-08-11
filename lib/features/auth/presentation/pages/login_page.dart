@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:g6_assessment/core/constants/constants.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_event.dart';
@@ -72,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
               return SizedBox(
                 height: MediaQuery.of(context).size.height,
                 width: double.infinity,
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(child: SpinKitDoubleBounce(color: Colors.blue)),
               );
             }
 

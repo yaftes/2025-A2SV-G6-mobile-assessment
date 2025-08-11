@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_event.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_state.dart';
@@ -91,7 +92,7 @@ class _SignupPageState extends State<SignupPage> {
                 return SizedBox(
                   height: MediaQuery.of(context).size.height,
                   width: double.infinity,
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(child: SpinKitDoubleBounce(color: Colors.blue)),
                 );
               } else if (state is ErrorState) {
                 return SizedBox(

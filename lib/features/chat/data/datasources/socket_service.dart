@@ -5,21 +5,22 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 abstract class SocketService {
   Future<void> connect(String token);
 
-  void sendMessage({
-    required String chatId,
-    required String content,
-    String type,
-  });
-
   void onMessageReceived(Function(dynamic) callback);
 
   void onMessageDelivered(Function(dynamic) callback);
 
   Future<void> disconnect();
+  void sendMessage({
+    required String chatId,
+    required String content,
+    String type,
+  });
 }
 
 class SocketServiceImpl extends SocketService {
   late IO.Socket socket;
+
+  SocketServiceImpl(this.socket);
 
   @override
   Future<void> connect(String token) async {

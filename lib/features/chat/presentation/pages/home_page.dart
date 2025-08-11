@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:g6_assessment/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:g6_assessment/features/chat/presentation/bloc/chat_event.dart';
 import 'package:g6_assessment/features/chat/presentation/bloc/chat_state.dart';
@@ -45,7 +46,9 @@ class _HomePageState extends State<HomePage> {
                         current is ErrorState,
                     builder: (context, state) {
                       if (state is UsersLoadingState) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(
+                          child: SpinKitDoubleBounce(color: Colors.white),
+                        );
                       } else if (state is ErrorState) {
                         return Center(child: Text(state.message));
                       } else if (state is LoadedUsersState) {
@@ -105,7 +108,9 @@ class _HomePageState extends State<HomePage> {
                     current is ErrorState,
                 builder: (context, state) {
                   if (state is ChatsLoadingState) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                      child: SpinKitDoubleBounce(color: Colors.blue),
+                    );
                   } else if (state is ErrorState) {
                     return Center(child: Text(state.message));
                   } else if (state is ChatsLoadedState) {

@@ -12,14 +12,18 @@ import 'package:g6_assessment/features/auth/domain/usecases/logout_usecase.dart'
 import 'package:g6_assessment/features/auth/domain/usecases/signup_usecase.dart';
 import 'package:g6_assessment/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:g6_assessment/features/chat/data/datasources/chat_remote_data_source.dart';
+import 'package:g6_assessment/features/chat/data/datasources/socket_service.dart';
 import 'package:g6_assessment/features/chat/data/repositories/chat_repository_impl.dart';
 import 'package:g6_assessment/features/chat/domain/repositories/chat_repository.dart';
+import 'package:g6_assessment/features/chat/domain/usecases/connect_socket_usecase.dart';
 import 'package:g6_assessment/features/chat/domain/usecases/delete_chat_usecase.dart';
+import 'package:g6_assessment/features/chat/domain/usecases/disconnect_socket_usecase.dart';
 import 'package:g6_assessment/features/chat/domain/usecases/get_all_users_usecase.dart';
 import 'package:g6_assessment/features/chat/domain/usecases/get_messages_usecase.dart';
 import 'package:g6_assessment/features/chat/domain/usecases/initiate_chat_usecase.dart';
 import 'package:g6_assessment/features/chat/domain/usecases/my_chat_by_id_usecase.dart';
 import 'package:g6_assessment/features/chat/domain/usecases/my_chats_usecase.dart';
+import 'package:g6_assessment/features/chat/domain/usecases/send_message_usecase.dart';
 import 'package:g6_assessment/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
@@ -42,6 +46,11 @@ Future<void> init() async {
     IO.OptionBuilder().setTransports(['websocket']).enableForceNew().build(),
   );
   getIt.registerSingleton<IO.Socket>(socket);
+
+  // Register SocketService with injected socket
+  getIt.registerLazySingleton<SocketService>(
+    () => SocketServiceImpl(getIt<IO.Socket>()),
+  );
 
   // Core
   getIt.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(getIt()));
@@ -97,6 +106,11 @@ Future<void> init() async {
   getIt.registerLazySingleton(() => InitiateChatUsecase(getIt()));
   getIt.registerLazySingleton(() => GetAllUsersUsecase(getIt()));
 
+  // sockets use cases
+  getIt.registerLazySingleton(() => SendMessageUsecase(getIt()));
+  getIt.registerLazySingleton(() => ConnectSocketUsecase(getIt()));
+  getIt.registerLazySingleton(() => DisconnectSocketUsecase(getIt()));
+
   // Chat BLoC
   getIt.registerFactory(
     () => ChatBloc(
@@ -106,6 +120,9 @@ Future<void> init() async {
       myChatByIdUsecase: getIt(),
       myChatsUsecase: getIt(),
       getAllUsersUsecase: getIt(),
+      connectSocketUsecase: getIt(),
+      disconnectSocketUsecase: getIt(),
+      sendMessageUsecase: getIt(),
     ),
   );
 }

@@ -31,3 +31,20 @@ class GetChatMessagesState extends ChatState {
 }
 
 class LoadingState extends ChatState {}
+
+// ==== socket state
+
+class SocketConnectingState extends ChatState {}
+
+class SocketConnectedState extends ChatState {}
+
+class SocketDisconnectedState extends ChatState {}
+
+class MessageSendingState extends ChatState {}
+
+class MessageSentState extends ChatState {}
+
+class NewMessageReceivedState extends ChatState {
+  final Message message;
+  NewMessageReceivedState(this.message);
+}

@@ -19,6 +19,7 @@ class ChatRepositoryImpl implements ChatRepository {
     this.networkInfo,
     this.socketService,
   );
+
   @override
   Future<Either<Failure, Unit>> deleteChat(String chatId) async {
     if (await networkInfo.isConnected) {
@@ -140,7 +141,6 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   void onMessageReceived(Function(Message) callback) {
     socketService.onMessageReceived((data) {
-      // Convert raw data to Message entity before callback
       final message = MessageModel.fromJson(data);
       callback(message);
     });

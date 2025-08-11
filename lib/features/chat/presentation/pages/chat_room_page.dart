@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:g6_assessment/features/chat/domain/entities/chat.dart';
+import 'package:g6_assessment/features/chat/domain/entities/message.dart';
 import 'package:g6_assessment/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:g6_assessment/features/chat/presentation/bloc/chat_event.dart';
 import 'package:g6_assessment/features/chat/presentation/bloc/chat_state.dart';
@@ -15,6 +16,8 @@ class ChatRoomPage extends StatefulWidget {
 
 class _ChatRoomPageState extends State<ChatRoomPage> {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
   Chat? chatData;
   String? receiverUserName;
 
@@ -31,14 +34,43 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.minScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ChatBloc, ChatState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is MessageSentState) {
+          _messageController.clear();
+          _scrollToBottom();
+        } else if (state is ErrorState) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+        } else if (state is GetChatMessagesState) {
+          _scrollToBottom();
+        }
+      },
       builder: (context, state) {
+        List<Message> messages = [];
+        if (state is GetChatMessagesState) {
+          messages = state.messages;
+        }
+
         return Scaffold(
           backgroundColor: const Color.fromARGB(255, 243, 243, 243),
           appBar: AppBar(
@@ -53,7 +85,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                 const SizedBox(
                   width: 50,
                   height: 50,
-                  child: CircleAvatar(backgroundColor: Colors.amber),
+                  child: CircleAvatar(
+                    backgroundImage: NetworkImage(
+                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjDGMp734S91sDuUFqL51_xRTXS15iiRoHew&s',
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 5),
                 Column(
@@ -93,12 +129,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   children: [
                     Expanded(
                       child: ListView.builder(
+                        controller: _scrollController,
                         reverse: true,
                         padding: const EdgeInsets.all(10),
-                        itemCount: state.messages.length,
+                        itemCount: messages.length,
                         itemBuilder: (context, index) {
-                          final message =
-                              state.messages[state.messages.length - 1 - index];
+                          final message = messages[messages.length - 1 - index];
                           return Align(
                             alignment: Alignment.centerLeft,
                             child: Container(
@@ -123,7 +159,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                     _buildMessageInput(),
                   ],
                 )
-              : const Center(child: SpinKitCircle(color: Colors.blue)),
+              : const Center(child: SpinKitDoubleBounce(color: Colors.blue)),
         );
       },
     );
@@ -167,8 +203,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             icon: const Icon(Icons.send),
             onPressed: () {
               final text = _messageController.text.trim();
-              if (text.isNotEmpty) {
-                // TODO: Send message logic
+              if (text.isNotEmpty && chatData != null) {
+                context.read<ChatBloc>().add(
+                  SendMessageEvent(chatId: chatData!.chatId, content: text),
+                );
               }
             },
           ),
