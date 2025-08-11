@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:g6_assessment/core/error/exceptions.dart';
 import 'package:g6_assessment/core/error/failures.dart';
 import 'package:g6_assessment/core/platform/network_info.dart';
+import 'package:g6_assessment/features/auth/domain/entities/user.dart';
 import 'package:g6_assessment/features/chat/data/datasources/chat_remote_data_source.dart';
 import 'package:g6_assessment/features/chat/domain/entities/chat.dart';
 import 'package:g6_assessment/features/chat/domain/entities/message.dart';
@@ -77,6 +78,21 @@ class ChatRepositoryImpl implements ChatRepository {
       }
     }
 
+    return Left(ServerFailure(message: 'Please Connect to internet'));
+  }
+
+  @override
+  Future<Either<Failure, List<User>>> getAllUsers() async {
+    if (await networkInfo.isConnected) {
+      try {
+        final result = await remoteDataSource.getAllUsers();
+        return Right(result);
+      } on ServerException catch (e) {
+        return Left(ServerFailure(message: e.message));
+      } on CacheException catch (e) {
+        return Left(CacheFailure(message: e.message));
+      }
+    }
     return Left(ServerFailure(message: 'Please Connect to internet'));
   }
 }

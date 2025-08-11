@@ -90,8 +90,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final data = decoded['data'];
 
       if (data == null && response.statusCode == 200) {
-        // we assue here the status code
-        // await localDataSource.deleteAccessToken(StorageKeys.accessToken);
         return User();
       }
 

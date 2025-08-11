@@ -26,3 +26,14 @@ class LoggedInState extends AuthState {
   final User user;
   LoggedInState(this.user);
 }
+
+class AuthMessageState extends AuthState {
+  final String message;
+  AuthMessageState(this.message);
+}
+
+// connection state
+
+class ConnectedState extends AuthState {}
+
+class DisConnectedState extends AuthState {}

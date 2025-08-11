@@ -54,7 +54,11 @@ class _LoginPageState extends State<LoginPage> {
           },
           builder: (context, state) {
             if (state is ErrorState) {
-              return Center(child: Text(state.message));
+              return SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: double.infinity,
+                child: Center(child: Text(state.message)),
+              );
             }
 
             if (state is LoadingState) {

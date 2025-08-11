@@ -6,6 +6,13 @@ import 'package:g6_assessment/features/auth/presentation/bloc/auth_state.dart';
 import 'package:g6_assessment/features/auth/presentation/widgets/custom_textfield.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/* we hold the user on auth gate
+- if we got token -> then request using that token
+ - not an internet connection or no token naviagate to login
+- inside login page if there is no interenet connection - don't show the 
+- login button same with sign up page
+
+*/
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
 
@@ -82,7 +89,11 @@ class _SignupPageState extends State<SignupPage> {
                   child: Center(child: CircularProgressIndicator()),
                 );
               } else if (state is ErrorState) {
-                return Center(child: Text(state.message));
+                return SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  width: double.infinity,
+                  child: Center(child: Text(state.message)),
+                );
               }
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:g6_assessment/core/constants/constants.dart';
 import 'package:g6_assessment/core/error/exceptions.dart';
+import 'package:g6_assessment/features/auth/data/models/user_model.dart';
+import 'package:g6_assessment/features/auth/domain/entities/user.dart';
 import 'package:g6_assessment/features/chat/domain/entities/chat.dart';
 import 'package:g6_assessment/features/chat/domain/entities/message.dart';
 import 'package:http/http.dart' as http;
@@ -13,6 +15,8 @@ abstract class ChatRemoteDataSource {
   Future<List<Message>> getChatMessages(String chatId);
   Future<void> initiateChat(String receiverId);
   Future<void> deleteChat(String chatId);
+
+  Future<List<User>> getAllUsers();
 }
 
 class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
@@ -175,6 +179,33 @@ class ChatRemoteDataSourceImpl extends ChatRemoteDataSource {
       return chats;
     } catch (e) {
       rethrow;
+    }
+  }
+
+  @override
+  Future<List<User>> getAllUsers() async {
+    try {
+      final token = await storage.read(key: StorageKeys.accessToken);
+
+      if (token == null || token.isEmpty) {
+        throw CacheException();
+      }
+
+      final response = await client.get(
+        Uri.parse(ChatApiConstants.getUsers),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw ServerException(response.body);
+      }
+
+      final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+      final List<dynamic> usersJson = decoded['data'];
+
+      return usersJson.map((user) => UserModel.fromJson(user)).toList();
+    } catch (e) {
+      throw ServerException(e.toString());
     }
   }
 }

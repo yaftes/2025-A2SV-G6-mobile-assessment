@@ -40,17 +40,19 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   height: screenHeight / 3.5,
                   decoration: const BoxDecoration(color: Colors.blue),
-                  child: const Row(
-                    children: [
-                      CustomAvatarWidget(
-                        backgroundColor: Colors.amber,
-                        borderColor: Colors.amber,
-                        imageUrl:
-                            'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png',
-                        name: 'Yafet',
-                      ),
-                    ],
-                  ),
+                  child: chats.isEmpty
+                      ? Center(child: Text('No available chats for now'))
+                      : ListView.builder(
+                          itemCount: chats.length,
+                          itemBuilder: (context, index) {
+                            return CustomAvatarWidget(
+                              backgroundColor: Colors.amber,
+                              borderColor: Colors.amberAccent,
+                              imageUrl: '',
+                              name: chats[index].senderName,
+                            );
+                          },
+                        ),
                 ),
                 Expanded(
                   child: Container(

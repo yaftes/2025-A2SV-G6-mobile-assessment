@@ -14,4 +14,5 @@ class ChatApiConstants {
   static const String baseUrl =
       'https://g5-flutter-learning-path-be-tvum.onrender.com/api/v3';
   static const String chatUrl = '$baseUrl/chats';
+  static const String getUsers = '$baseUrl/users';
 }
